@@ -105,6 +105,17 @@ class Database {
         
     }
 
+    //function to eliminate unwanted inputs that may come in the request
+    public function sortInputs($tablename,$data){
+        $tableCols=array_flip($this->getCols($tablename));
+        foreach($data as $key=>$value){
+            if(!array_key_exists($key, $tableCols)){
+                unset($data[$key]); //removing the unwanted.
+            }
+        }
+        return $data;
+    }
+
     public function insert($tablename,$data){
         try{
             $requiredFields=$this->getRequiredFields($tablename);
@@ -121,6 +132,9 @@ class Database {
                 $unhashed=$data['password'];
                 $data['password']=mask($unhashed);
             }
+
+            //sanitizing the input array ie removing unwanted params
+            $data=$this->sortInputs($tablename,$data);
 
             //now we know that all values required are present and username is unique
             $query="INSERT INTO $tablename (";
@@ -228,10 +242,9 @@ class Database {
             if(empty($condition) || empty($data)){
                 throw new Exception("Looks like we have a missing condition for this update. Aborting Now",2);
             }
-            //check that the keys match db cols
-            if(!empty($unexpectedCols=$this->checkCols($tablename,$data))){
-                throw new Exception("Found the following unexpected fields. Please remove from request: ".implode(", ",$unexpectedCols),2);
-            }
+            //removing any unwanted fields in the request
+            $data=$this->sortInputs($tablename,$data);
+
             //creating a separate dataset without the condition being shown in the set clause
             $overallData=$data;
             $keysToEliminate=array_keys($condition);
@@ -258,7 +271,7 @@ class Database {
                 throw new Exception("The update either failed or could not match a row to update",2);
             }
         }catch(Exception $e){
-            echo response(0,[],"",$e->getMessage());
+            echo response(0,[$query],"",$e->getMessage());
             die();
         }
     }
@@ -277,7 +290,8 @@ class Database {
             $unexpectedKeys=array();
             foreach($data as $key=>$val){
                 if(!array_key_exists($key,$result)){
-                    $unexpectedKeys[]=$key;
+                    //$unexpectedKeys[]=$key;
+                    array_splice($data,1,1);
                 }
             }
             return ($unexpectedKeys);

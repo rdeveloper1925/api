@@ -1,7 +1,7 @@
 <?php
-namespace App;
-include_once "Database.php";
-include_once "Helpers.php";
+namespace App\Actions;
+include_once (__DIR__."\..\Database.php");
+include_once (__DIR__."\..\Helpers.php");
 use App\Database;
 
 class Actions{

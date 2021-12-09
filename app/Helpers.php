@@ -1,4 +1,5 @@
 <?php 
+
 use Pecee\SimpleRouter\SimpleRouter as Router;
 use Pecee\Http\Url;
 use Pecee\Http\Response;
