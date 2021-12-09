@@ -119,24 +119,10 @@ class Database {
     public function insert($tablename,$data){
         try{
             $requiredFields=$this->getRequiredFields($tablename);
-            //CHECK for availability of all fields
-            if(is_array($missingFields=$this->sanitizeInputs($tablename,$data))){ //when it returns array then we have missing values
-                $msg="The following are required: ".implode(", ",$missingFields);
-                throw new Exception($msg,4);
-            }
-            //check for unique fields and if their unique constraint isnt violated.
-            $this->checkUniqueness($tablename,$data); 
+            //function bulk validates all input data. returns more db friendly input data
+            $data=$this->sanitizeInputs($tablename,$data);
 
-            //handling passwords
-            if(array_key_exists('password',$data)){
-                $unhashed=$data['password'];
-                $data['password']=mask($unhashed);
-            }
-
-            //sanitizing the input array ie removing unwanted params
-            $data=$this->sortInputs($tablename,$data);
-
-            //now we know that all values required are present and username is unique
+            //now we know that all values required are present, valid and username is unique
             $query="INSERT INTO $tablename (";
             $valuesPart="VALUES ("; //iterating the values part simultaneously
             foreach($requiredFields as $k=>$field){
@@ -153,7 +139,7 @@ class Database {
             $stmt=$this->conn->prepare($query);
             $result=$stmt->execute($data);
             unset($data["password"]);
-            return $result;
+            return $result ? $this->conn->lastInsertId(): null;
             //return $result?response(true,$data,"User Created Successfully!"):response(0,[],"Sorry! An unknown error occured","Sorry! An unknown error occured");
         }catch(Exception $e){
             echo response(0,[],"",$e->getMessage());
@@ -190,23 +176,55 @@ class Database {
 
     }
 
-    public function sanitizeInputs($tablename,$data){
-        //checking for missing fields
-        $requiredFields=$this->getRequiredFields($tablename);
-        $missingFields=array();
-        foreach($requiredFields as $key){
-            if(!array_key_exists($key,$data)){ //checking that the key exists in the data supplied
-                $missingFields[]=ucwords($key);
-            }else{ //if it exists, proceed to check that it aint empty
-                if(is_null($data[$key])){
-                    $missingFields[]=ucwords($key);
+    //function checks for missing inputs, removes unwanted fields and form validation
+    public function sanitizeInputs($tablename,$data,$flags=array()){
+        try{
+            //1- Look for missing fields except for update
+            $missingFields=array(); 
+            if(!in_array("skipMissing",$flags)){ 
+                $requiredFields=$this->getRequiredFields($tablename);
+                foreach($requiredFields as $key){
+                    if(!array_key_exists($key,$data)){ //checking that the key exists in the data supplied
+                        $missingFields[]=ucwords($key);
+                    }else{ //if it exists, proceed to check that it aint empty
+                        if(!isset($data[$key]) || trim($data[$key])==""){
+                            $missingFields[]=ucwords($key);
+                        }
+                    }
                 }
             }
-        }
-        if(!empty($missingFields)){
-            return $missingFields;
-        }else{
-            return true;
+            //stop further processing if we have missing fields
+            if(!empty($missingFields)){ //this will be skipped if skipMissing flag is set
+                throw new Exception("Oops! Looks like the following vital fields are missing: ".implode(", ",$missingFields));
+            }
+
+            //2- Sort inputs, removing any extra that are unwanted.
+            $tableCols=array_flip($this->getCols($tablename));
+            foreach($data as $key=>$value){
+                if(!array_key_exists($key, $tableCols)){
+                    unset($data[$key]); //removing the unwanted.
+                }
+            }
+            
+            //3- Performing validations on the data provided
+            if(!empty($validationResult=validate($data))){
+                throw new Exception(implode(", ",$validationResult));
+            }
+
+            //4- House keeping for passwords
+            if(array_key_exists('password',$data)){
+                $unhashed=$data['password'];
+                $data['password']=mask($unhashed);
+            }
+
+            //5- House keeping for unique values: check for unique fields and if their unique constraint isnt violated.
+            $this->checkUniqueness($tablename,$data); 
+
+            return $data; //because we made some changes to the data (sorting)
+
+        }catch(Exception $e){
+            echo response(0,[],"",$e->getMessage());
+            die();
         }
     }
 
@@ -242,11 +260,10 @@ class Database {
             if(empty($condition) || empty($data)){
                 throw new Exception("Looks like we have a missing condition for this update. Aborting Now",2);
             }
-            //removing any unwanted fields in the request
-            $data=$this->sortInputs($tablename,$data);
+            //Validating received data
+            $data=$this->sanitizeInputs($tablename,$data,["skipMissing"]);
 
-            //creating a separate dataset without the condition being shown in the set clause
-            $overallData=$data;
+            //So we'd hate to update the key being used as
             $keysToEliminate=array_keys($condition);
             foreach($keysToEliminate as $k){ //iterate through condition array to see the keys there
                 if(array_key_exists($k,$data)){ //if that key exists in the original dataset,.....
@@ -321,7 +338,6 @@ class Database {
             $query .= $this->implementFillables($condition,"and");
             $stmt=$this->conn->prepare($query);
             $result=$stmt->execute($condition);
-            var_dump($result,$stmt->rowCount());
             if($stmt->rowCount()>0 && $result){
                 return 1;
             }else if($stmt->rowCount()<=0 && $result){

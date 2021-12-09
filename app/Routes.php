@@ -39,7 +39,7 @@ SimpleRouter::all(BASE_URL."/unauthorized", function(){
 });
 
 //Primary route
-SimpleRouter::get(BASE_URL."/",[Actions::class,'start']);
+SimpleRouter::match(["get","post"],BASE_URL."/",[Actions::class,'start']);
 
 SimpleRouter::get(BASE_URL."/tasks", [Actions::class,'getAllTasks']);
 SimpleRouter::post(BASE_URL."/tasks", [Actions::class,'saveTask']);
@@ -51,3 +51,4 @@ SimpleRouter::post(BASE_URL."/users/token", [UserActions::class, "getToken"]);
 SimpleRouter::post(BASE_URL."/users", [UserActions::class, "saveUser"]);
 SimpleRouter::get(BASE_URL."/users/{id}", [UserActions::class, "getUser"]);
 SimpleRouter::put(BASE_URL."/users/{id}", [UserActions::class, "updateUser"]);
+SimpleRouter::delete(BASE_URL."/users/{id}", [UserActions::class, "deleteUser"]);
