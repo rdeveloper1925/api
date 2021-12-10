@@ -3,9 +3,11 @@ include_once "Config.php";
 include_once "Utils.php";
 include_once "Actions/Actions.php";
 include_once "Actions/UserActions.php";
+include_once "Middleware/Test.php";
 
 use App\Actions\Actions;
 use App\Actions\UserActions;
+use App\Middleware\TestMiddleware;
 use Pecee\Http\Request;
 use Pecee\Http\Response;
 
@@ -28,27 +30,39 @@ SimpleRouter::error(function(Request $request,Exception $exception){
     }
 });
 
-//ROUTE FOR 404 NOT FOUND
-SimpleRouter::all(BASE_URL."/not-found", function(){
-    return response(0,null,"Unknown Route","Information requested for was not found");
+//Wrapper for the routes
+SimpleRouter::group(["prefix"=>BASE_URL], function (){
+
+    //ROUTE FOR 404 NOT FOUND
+    SimpleRouter::all("/not-found", function(){
+        return response(0,null,"Unknown Route","Information requested for was not found");
+    });
+
+    //ROUTE FOR 403 UNAUTHORIZED
+    SimpleRouter::all("/unauthorized", function(){
+        return response(0,null,"Unauthorized Access","You are not allowed to view the information requested. Check that you have access or the request method");
+    });
+
+    //Primary route
+    SimpleRouter::match(["get","post"],"/",[Actions::class,'start']);
+
+    SimpleRouter::get("/tasks", [Actions::class,'getAllTasks']);
+    SimpleRouter::post("/tasks", [Actions::class,'saveTask']);
+    SimpleRouter::put("/tasks/{id}", [Actions::class,'updateTask']);
+    SimpleRouter::delete("/tasks/{id}", [Actions::class,'deleteTask']);
+
+    //USER MANAGEMENT ROUTES
+    SimpleRouter::post("/users/token", [UserActions::class, "getToken"]);
+    SimpleRouter::post("/users", [UserActions::class, "saveUser"]);
+    SimpleRouter::get("/users/{id}", [UserActions::class, "getUser"]);
+    SimpleRouter::put("/users/{id}", [UserActions::class, "updateUser"]);
+    SimpleRouter::delete("/users/{id}", [UserActions::class, "deleteUser"]);
+
+    //Middleware tests
+    SimpleRouter::group(["middleware"=>TestMiddleware::class], function (){
+        SimpleRouter::get("/test", function(){
+            return "protected";
+        });
+    });
+
 });
-
-//ROUTE FOR 403 UNAUTHORIZED
-SimpleRouter::all(BASE_URL."/unauthorized", function(){
-    return response(0,null,"Unauthorized Access","You are not allowed to view the information requested. Check that you have access or the request method");
-});
-
-//Primary route
-SimpleRouter::match(["get","post"],BASE_URL."/",[Actions::class,'start']);
-
-SimpleRouter::get(BASE_URL."/tasks", [Actions::class,'getAllTasks']);
-SimpleRouter::post(BASE_URL."/tasks", [Actions::class,'saveTask']);
-SimpleRouter::put(BASE_URL."/tasks/{id}", [Actions::class,'updateTask']);
-SimpleRouter::delete(BASE_URL."/tasks/{id}", [Actions::class,'deleteTask']);
-
-//USER MANAGEMENT ROUTES
-SimpleRouter::post(BASE_URL."/users/token", [UserActions::class, "getToken"]);
-SimpleRouter::post(BASE_URL."/users", [UserActions::class, "saveUser"]);
-SimpleRouter::get(BASE_URL."/users/{id}", [UserActions::class, "getUser"]);
-SimpleRouter::put(BASE_URL."/users/{id}", [UserActions::class, "updateUser"]);
-SimpleRouter::delete(BASE_URL."/users/{id}", [UserActions::class, "deleteUser"]);

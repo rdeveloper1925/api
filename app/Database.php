@@ -4,7 +4,7 @@ namespace App;
 use Exception;
 use PDO, PDOException;
 
-// include_once "Config.php";
+include_once "Config.php";
 include_once "Utils.php";
 
 //Holds prime fuctions relating to the database
@@ -12,10 +12,10 @@ class Database {
     public $conn=null;
     public function __construct(){
         try {
-            $host="localhost";
-            $db="api";
-            $pass="";
-            $user="root";
+            $host=DB_HOST;
+            $db=DB;
+            $pass=DB_PASS;
+            $user=DB_USER;
             $dsn = "mysql:dbname=$db;host=$host";
             $options  = array(
                 PDO::ATTR_ERRMODE =>PDO::ERRMODE_EXCEPTION,

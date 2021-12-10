@@ -46,7 +46,7 @@ function response(int $success,$data=[],$information="",$errors=""){
 function mask($pass){
     //salting
     $pass=$pass.APP_KEY;
-    return password_hash($pass,PASSWORD_BCRYPT);
+    return hash("sha512",$pass);
 }
 
 //request input validation
@@ -109,6 +109,21 @@ function regexMatcher($value, $validationResult, $pattern, $msgonfailure="Malfor
         $validationResult[]=$msgonfailure;
     }
     return $validationResult;
+}
+
+//retrieve authentication token from request
+function extractToken($request){
+    $requestHeaders=apache_request_headers();
+    if(isset($requestHeaders["Authentication"])){
+        $token=$requestHeaders["Authentication"];
+    }else if(isset($request["http_authentication"])){
+        $token=$request["http_authentication"];
+    }else if(isset($_SERVER["HTTP_AUTHENTICATION"])){
+        $token=$_SERVER["HTTP_AUTHENTICATION"];
+    }else{
+        throw new Exception("Missing authentication token in request");
+    }
+    return $token;
 }
 
 //request input validation
