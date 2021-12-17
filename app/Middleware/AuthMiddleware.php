@@ -11,7 +11,7 @@ use Pecee\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class TestMiddleware implements IMiddleware{
+class AuthMiddleware implements IMiddleware{
     public function handle(Request $request):void{
         try{
             //can use $request->getHeaders() to get request headers

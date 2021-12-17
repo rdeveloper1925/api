@@ -3,11 +3,11 @@ include_once "Config.php";
 include_once "Utils.php";
 include_once "Actions/Actions.php";
 include_once "Actions/UserActions.php";
-include_once "Middleware/Test.php";
+include_once "Middleware/AuthMiddleware.php";
 
 use App\Actions\Actions;
 use App\Actions\UserActions;
-use App\Middleware\TestMiddleware;
+use App\Middleware\AuthMiddleware;
 use Pecee\Http\Request;
 use Pecee\Http\Response;
 
@@ -58,8 +58,8 @@ SimpleRouter::group(["prefix"=>BASE_URL], function (){
     SimpleRouter::put("/users/{id}", [UserActions::class, "updateUser"]);
     SimpleRouter::delete("/users/{id}", [UserActions::class, "deleteUser"]);
 
-    //Middleware tests
-    SimpleRouter::group(["middleware"=>TestMiddleware::class], function (){
+    //Auth protected routes
+    SimpleRouter::group(["middleware"=>AuthMiddleware::class], function (){
         SimpleRouter::get("/test", function(){
             return "protected";
         });
