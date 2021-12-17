@@ -5,6 +5,7 @@ namespace App\Middleware;
 require_once (__DIR__."\..\..\\vendor\autoload.php");
 
 use Exception;
+use Firebase\JWT\ExpiredException;
 use Pecee\Http\Middleware\IMiddleware;
 use Pecee\Http\Request;
 use Firebase\JWT\JWT;
@@ -14,18 +15,14 @@ class TestMiddleware implements IMiddleware{
     public function handle(Request $request):void{
         try{
             //can use $request->getHeaders() to get request headers
-            //$token=extractToken();
+            $token=extractToken();
             //decode the token
-            //$decoded=JWT::decode($token, new Key(APP_KEY, "HS512"));
+            $decoded=JWT::decode($token, new Key(APP_KEY, "HS512"));
+            //verify expiry validity of the token
+            if($decoded->expiry <= time()){
+                throw new ExpiredException("Token has expired. Request for a new one");
+            }
 
-            $payload = array(
-                "expiry" => time()+(5*60),
-                "generated" => time()
-            );
-            $jwt=JWT::encode($payload,APP_KEY,"HS512");
-            var_dump([$_SERVER,$request,$jwt]);
-
-            //die();
         }catch(Exception $e){
             echo response(0,[],"",$e->getMessage());
             die();

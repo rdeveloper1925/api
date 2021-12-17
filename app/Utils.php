@@ -115,8 +115,10 @@ function regexMatcher($value, $validationResult, $pattern, $msgonfailure="Malfor
 function extractToken(){
     $requestHeaders=apache_request_headers();
     $request=request()->getHeaders();
-    if(isset($requestHeaders["Authentication"])){
-        $token=$requestHeaders["Authentication"];
+    if(isset($requestHeaders["Authorization"])){
+        $token=$requestHeaders["Authorization"];
+        $exploded=explode(" ",$token);
+        $token=trim($exploded[1]);
     }else if(isset($request["http_authentication"])){
         $token=$request["http_authentication"];
     }else if(isset($_SERVER["HTTP_AUTHENTICATION"])){

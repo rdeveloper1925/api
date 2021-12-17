@@ -28,13 +28,13 @@ class UserActions{
         $userData=$userData[0];
         //generate the token
         $payload = array( //info will be used by middleware to authorize different accesses
-            "expiry" => time()+(25*60),
+            "expiry" => time()+(1*60),
             "generated" => time(),
-            "userData"=>$userData
+            "userId"=>$userData["username"]."-".$userData["id"]
         );
         $token=JWT::encode($payload,APP_KEY,"HS512");
         //update token in the user table
-        $result=$this->db->update("users",["token"=>$token],["id"=>$userData["id"]]);
+        $this->db->update("users",["token"=>$token],["id"=>$userData["id"]]);
         //supply token to user
         return response(1,["token"=>$token],"Access expires in ".(($payload["expiry"]-$payload["generated"])/60)." minutes");
     }
