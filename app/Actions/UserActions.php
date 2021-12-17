@@ -3,6 +3,7 @@ namespace App\Actions;
 include_once (__DIR__."\..\Database.php");
 include_once (__DIR__."\..\Helpers.php");
 use App\Database;
+use Firebase\JWT\JWT;
 
 class UserActions{
     public $db;
@@ -13,9 +14,29 @@ class UserActions{
         $this->tablename="users";
     }
 
-    //get user token
+    //get user token:: Post
     public function getToken(){
-        var_dump(input()->all());
+        //authenticate the user
+        $data=input()->all();
+        if(!isset($data["username"]) || !isset($data["password"])){ 
+            return response(0,[],"Username and/or password missing");
+        }
+        $userData=$this->db->selectWhere("users",["username"=>$data["username"],"password"=>mask($data["password"])]);
+        if(empty($userData)){
+            return response(0,[],"Incorrect Username and/or password");
+        }
+        $userData=$userData[0];
+        //generate the token
+        $payload = array( //info will be used by middleware to authorize different accesses
+            "expiry" => time()+(25*60),
+            "generated" => time(),
+            "userData"=>$userData
+        );
+        $token=JWT::encode($payload,APP_KEY,"HS512");
+        //update token in the user table
+        $result=$this->db->update("users",["token"=>$token],["id"=>$userData["id"]]);
+        //supply token to user
+        return response(1,["token"=>$token],"Access expires in ".(($payload["expiry"]-$payload["generated"])/60)." minutes");
     }
 
     public function saveUser(){
@@ -26,10 +47,15 @@ class UserActions{
 
     public function getUser($id){
         $result=$this->db->selectWhere("users",["id"=>$id]);
-        return response(1,$result,"User Returned");
+        if(!empty($result)){
+            return response(1,$result,"User Returned");
+        }else{
+            return response(0,$result,"No such user was found");
+        }
     }
 
     public function updateUser($id){
+        //put params should be form-url-encoded
         $data=getPutParams();
         $result=$this->db->update("users",$data,["id"=>$id]);
         return is_array($result)? response(1,$result,"Updated Successfully") : false;
@@ -39,4 +65,5 @@ class UserActions{
         $result=$this->db->delete("users",["id"=>$id]);
         return $result? response(1,[],"Deleted Successfully") : false;
     }
+
 }

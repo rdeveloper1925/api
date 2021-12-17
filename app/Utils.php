@@ -112,8 +112,9 @@ function regexMatcher($value, $validationResult, $pattern, $msgonfailure="Malfor
 }
 
 //retrieve authentication token from request
-function extractToken($request){
+function extractToken(){
     $requestHeaders=apache_request_headers();
+    $request=request()->getHeaders();
     if(isset($requestHeaders["Authentication"])){
         $token=$requestHeaders["Authentication"];
     }else if(isset($request["http_authentication"])){
