@@ -1,6 +1,11 @@
 <?php
 include_once "Config.php";
 
+//gets any extra result information that may have come thru
+function getResultInfo($result){
+    return empty($result)?"No data returned":"";
+}
+
 function see($variable){
     $trace=debug_backtrace();
     $cut_trace=array_shift($trace);

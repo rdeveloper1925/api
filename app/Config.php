@@ -1,5 +1,6 @@
 <?php
-define("BASE_URL","/api/v1");
+define("API_BASE_URL","/api/v1");
+define("WEB_BASE_URL","/api");
 define("APP_KEY","F682109AA8743B44D01E721503568A9CC8DE4EAA9EA07BC35CC31A020BEA2679");
 define("DB_HOST","localhost");
 define("DB_PASS","");

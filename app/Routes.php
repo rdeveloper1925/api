@@ -2,10 +2,12 @@
 include_once "Config.php";
 include_once "Utils.php";
 include_once "Actions/Actions.php";
+include_once "Actions/ProductActions.php";
 include_once "Actions/UserActions.php";
 include_once "Middleware/AuthMiddleware.php";
 
 use App\Actions\Actions;
+use App\Actions\ProductActions;
 use App\Actions\UserActions;
 use App\Middleware\AuthMiddleware;
 use Pecee\Http\Request;
@@ -18,11 +20,11 @@ use Pecee\SimpleRouter\SimpleRouter;
 SimpleRouter::error(function(Request $request,Exception $exception){
     switch($exception->getCode()){
         case "4054":
-            SimpleRouter::response()->redirect(BASE_URL."/not-found");
+            SimpleRouter::response()->redirect(API_BASE_URL."/not-found");
             break;
         
         case "4043":
-            SimpleRouter::response()->redirect(BASE_URL."/unauthorized");
+            SimpleRouter::response()->redirect(API_BASE_URL."/unauthorized");
             break;
 
         default:
@@ -31,7 +33,7 @@ SimpleRouter::error(function(Request $request,Exception $exception){
 });
 
 //Wrapper for the routes
-SimpleRouter::group(["prefix"=>BASE_URL], function (){
+SimpleRouter::group(["prefix"=>API_BASE_URL], function (){
 
     //ROUTE FOR 404 NOT FOUND
     SimpleRouter::all("/not-found", function(){
@@ -65,4 +67,27 @@ SimpleRouter::group(["prefix"=>BASE_URL], function (){
         });
     });
 
+});
+
+//web routes
+SimpleRouter::group(["prefix"=>WEB_BASE_URL], function (){
+    SimpleRouter::post("/login", [UserActions::class, "login"]);
+
+    SimpleRouter::post("products", [ProductActions::class, "saveProduct"]);
+    SimpleRouter::get("products", [ProductActions::class, "getProducts"]);
+    SimpleRouter::get("products/{id}", [ProductActions::class, "getProduct"]);
+    SimpleRouter::put("products/{id}", [ProductActions::class, "updateProduct"]);
+    SimpleRouter::delete("products/{id}", [ProductActions::class, "deleteProduct"]);
+
+    //Handling images
+    SimpleRouter::get("/products/images/{img}",function($img){
+        $path=__DIR__."\Storage\productImages\img.jpg";
+        header('Content-Disposition: attachment; filename="Storage/productImages/img.jpg"');
+        echo readfile($path);
+        return 1;
+    });
+
+    SimpleRouter::get("/web", function(){
+        return "Hello webber";
+    });
 });

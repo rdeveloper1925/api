@@ -66,4 +66,18 @@ class UserActions{
         return $result? response(1,[],"Deleted Successfully") : false;
     }
 
+    //web user login
+    public function login(){
+        $data=input()->all();
+        if(!isset($data["username"]) || !isset($data["password"])){ 
+            return response(0,[],"Username and/or password missing");
+        }
+        $result=$this->db->selectWhere('users',["username"=>$data['username'],"password"=>mask($data['password'])]);
+        if(!empty($result)){
+            return response(1,[$result]);
+        }else{
+            return response(0,[],"Username/password incorrect");
+        }
+    }
+
 }

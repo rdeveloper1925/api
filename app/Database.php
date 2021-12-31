@@ -230,7 +230,6 @@ class Database {
 
     public function selectWhere($tablename, $conditions=array(),$glue="and"){ //['username'=>['=rodney'," and"]]
         try{
-            //for 
             if(empty($conditions)){
                 $query="SELECT * FROM $tablename ";
             }else{
@@ -311,7 +310,8 @@ class Database {
                     array_splice($data,1,1);
                 }
             }
-            return ($unexpectedKeys);
+            return ($data);
+            //see([$data, $unexpectedKeys]);
         }catch(Exception $e){
             echo response(0,[],"",$e->getMessage());
             die();
@@ -333,6 +333,7 @@ class Database {
 
     public function delete($tablename,$condition){
         try{
+            if(empty($condition)){throw new Exception("Condition is required for delete method");}
             $this->checkCondition($condition);
             $query="DELETE FROM $tablename WHERE ";
             $query .= $this->implementFillables($condition,"and");
