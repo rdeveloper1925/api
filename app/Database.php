@@ -49,6 +49,22 @@ class Database {
         }
     }
 
+    public function selectFromMultiple($tables, $conditions, $glue="and"){
+        try{
+            $query="SELECT * FROM ".implode(", ",$tables)." WHERE ";
+            $query.=$this->implementFillables($conditions);
+            $stmt=$this->conn->prepare($query);
+            $stmt->execute();
+            $result=$stmt->fetchAll();
+            see($query);
+            see($result);
+            return ($result);
+        }catch(Exception $e){
+            echo response(0,[],"",$e->getMessage());
+            die();
+        }
+    }
+
     public function getRequiredFields($tablename){
         try{
             $query="desc $tablename ";
@@ -324,7 +340,7 @@ class Database {
             $stmt=$this->conn->prepare($query);
             $rs=$stmt->execute();
             $result=$stmt->fetchAll();
-            see([$result,$rs]);
+            return $result;
         }catch(Exception $e){
             echo response(0,[],"",$e->getMessage());
             die();

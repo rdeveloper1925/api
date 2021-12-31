@@ -4,10 +4,12 @@ include_once "Utils.php";
 include_once "Actions/Actions.php";
 include_once "Actions/ProductActions.php";
 include_once "Actions/UserActions.php";
+include_once "Actions/CategoryActions.php";
 include_once "Middleware/AuthMiddleware.php";
 
 use App\Actions\Actions;
 use App\Actions\ProductActions;
+use App\Actions\CategoryActions;
 use App\Actions\UserActions;
 use App\Middleware\AuthMiddleware;
 use Pecee\Http\Request;
@@ -78,6 +80,15 @@ SimpleRouter::group(["prefix"=>WEB_BASE_URL], function (){
     SimpleRouter::get("products/{id}", [ProductActions::class, "getProduct"]);
     SimpleRouter::put("products/{id}", [ProductActions::class, "updateProduct"]);
     SimpleRouter::delete("products/{id}", [ProductActions::class, "deleteProduct"]);
+    //join test
+    SimpleRouter::get("product/join", [ProductActions::class, "joinTest"]);
+
+    //product category routes
+    SimpleRouter::post("categories", [CategoryActions::class, "saveCategory"]);
+    SimpleRouter::get("categories", [CategoryActions::class, "getCategories"]);
+    SimpleRouter::get("categories/{id}", [CategoryActions::class, "getCategory"]);
+    SimpleRouter::put("categories/{id}", [CategoryActions::class, "updateCategory"]);
+    SimpleRouter::delete("categories/{id}", [CategoryActions::class, "deleteCategory"]);
 
     //Handling images
     SimpleRouter::get("/products/images/{img}",function($img){

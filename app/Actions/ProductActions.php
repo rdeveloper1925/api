@@ -44,4 +44,10 @@ class ProductActions{
         $result=$this->db->delete('products',['id'=>$id]);
         return $result? response(1,[],"Deleted Successfully") : false;
     }
+
+    //join test
+    public function joinTest(){
+        $result=$this->db->runQuery("SELECT * FROM PRODUCTS, CATEGORIES WHERE PRODUCTS.categoryId=CATEGORIES.ID");
+        return response(1,$result);
+    }
 }
