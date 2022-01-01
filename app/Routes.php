@@ -17,7 +17,8 @@ use Pecee\Http\Response;
 
 use Pecee\SimpleRouter\SimpleRouter;
 
-//SimpleRouter::response()->header("Content-Type: application/json");
+SimpleRouter::response()->header("Content-Type: application/json");
+SimpleRouter::response()->header("Access-Control-Allow-origin: http://localhost:3000");
 //ERROR HANDLING FOR ROUTING
 SimpleRouter::error(function(Request $request,Exception $exception){
     switch($exception->getCode()){

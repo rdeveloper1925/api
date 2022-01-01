@@ -24,13 +24,13 @@ class CategoryActions{
     //get All categories
     public function getcategories(){
         $result=$this->db->selectAll("categories");
-        return response(1,[$result],getResultInfo($result));
+        return response(1,$result,getResultInfo($result));
     }
 
     //get one Category
     public function getCategory($id){
         $result=$this->db->selectWhere('categories',["id"=>$id]);
-        return response(1,[$result],getResultInfo($result));
+        return response(1,$result,getResultInfo($result));
     }
 
     //edit Category

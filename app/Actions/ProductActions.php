@@ -23,13 +23,13 @@ class ProductActions{
     //get All Products
     public function getProducts(){
         $result=$this->db->selectAll("products");
-        return response(1,[$result],getResultInfo($result));
+        return response(1,$result,getResultInfo($result));
     }
 
     //get one Product
     public function getProduct($id){
         $result=$this->db->selectWhere('products',["id"=>$id]);
-        return response(1,[$result],getResultInfo($result));
+        return response(1,$result,getResultInfo($result));
     }
 
     //edit product

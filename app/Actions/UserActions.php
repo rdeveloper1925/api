@@ -74,7 +74,7 @@ class UserActions{
         }
         $result=$this->db->selectWhere('users',["username"=>$data['username'],"password"=>mask($data['password'])]);
         if(!empty($result)){
-            return response(1,[$result]);
+            return response(1,$result);
         }else{
             return response(0,[],"Username/password incorrect");
         }
