@@ -163,6 +163,44 @@ class Database {
         }
     }
 
+    //moves the
+    public function insertFile($tablename,$files,$resourceId,$allowedExtensions=["jpg","jpeg","png","csv","xlsx"]){
+        try{
+            $results=array();
+            $uploadedFiles=uploadFile($files,$resourceId,$allowedExtensions);
+            foreach($uploadedFiles as $data){
+                $requiredFields=$this->getRequiredFields($tablename);
+                //function bulk validates all input data. returns more db friendly input data
+                $data=$this->sanitizeInputs($tablename,$data);
+
+                //now we know that all values required are present, valid and username is unique
+                $query="INSERT INTO $tablename (";
+                $valuesPart="VALUES ("; //iterating the values part simultaneously
+                foreach($requiredFields as $k=>$field){
+                    if($k==array_key_last($requiredFields)){ //closing the values part if this is the last iteration
+                        $query.="`$field`) ";
+                        $valuesPart .= ":$field)";
+                    }else{
+                        $query.="`$field`, ";
+                        $valuesPart .= ":$field, ";
+                    }
+                }
+                $query .= $valuesPart;
+                //now bind the params to the query
+                $stmt=$this->conn->prepare($query);
+                $stmt->execute($data);
+                $lastInsert=$this->conn->lastInsertId();
+                $result=$this->update($tablename,["url"=>CURRENT_URL."/$lastInsert"],["id"=>$lastInsert]);
+                $results[]=$result;
+            }
+            return $results;
+            //return $result?response(true,$data,"User Created Successfully!"):response(0,[],"Sorry! An unknown error occured","Sorry! An unknown error occured"); */
+        }catch(Exception $e){
+            echo response(0,[],"",$e->getMessage());
+            die();
+        }
+    }
+
     //Gets all the columns of a table
     public function getCols($tablename){
         try{

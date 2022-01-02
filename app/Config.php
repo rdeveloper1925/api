@@ -7,5 +7,8 @@ define("DB_PASS","");
 define("DB","api");
 define("DB_USER","root");
 
+define("CURRENT_URL","http://localhost".API_BASE_URL."/files");
+
+
 
 //validation messages

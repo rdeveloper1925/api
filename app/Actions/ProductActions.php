@@ -13,11 +13,20 @@ class ProductActions{
         $this->tablename="users";
     }
 
-    //insert image
+    //insert product if it has images
     public function saveProduct(){
-        $data=input()->all();
-        $result=$this->db->insert("products",$data);
-        return response(1,["id"=>$result],"Data Saved Successfully");
+        //if request has images,
+        //1. here the text inputs are provided by $_POST not input()->all()
+        $productId=$this->db->insert("products",$_POST);
+        //2. then the file(s) are uploaded and recorded in the db
+        if(!empty($_FILES)){
+            $uploadResults=$this->db->insertFile("productImages",$_FILES,$productId);
+        }
+        
+        see($uploadResults);
+        see($_FILES);
+        seedie($productId);
+        return response(1,["id"=>$productId],"Data Saved Successfully");
     }
 
     //get All Products

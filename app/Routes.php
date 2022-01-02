@@ -17,8 +17,10 @@ use Pecee\Http\Response;
 
 use Pecee\SimpleRouter\SimpleRouter;
 
-SimpleRouter::response()->header("Content-Type: application/json");
-SimpleRouter::response()->header("Access-Control-Allow-origin: http://localhost:3000");
+//SimpleRouter::response()->header("Content-Type: application/json");
+SimpleRouter::response()->header("Access-Control-Allow-origin: http://localhost:3000"); //required with react apps. replace with the react app url upon deployment
+
+#####################################START OF DEFAULT ROUTES! DO NOT DELETE#########################
 //ERROR HANDLING FOR ROUTING
 SimpleRouter::error(function(Request $request,Exception $exception){
     switch($exception->getCode()){
@@ -34,6 +36,12 @@ SimpleRouter::error(function(Request $request,Exception $exception){
             return response(0,$exception,$exception->getMessage());
     }
 });
+
+//Route for files
+SimpleRouter::get(API_BASE_URL."/files/{tablename}/{id}",[Actions::class,"getFile"]);
+SimpleRouter::get(WEB_BASE_URL."/files/{tablename}/{id}",[Actions::class,"getFile"]);
+##################################### END OF DEFAULT ROUTES! DO NOT DELETE#########################
+
 
 //Wrapper for the routes
 SimpleRouter::group(["prefix"=>API_BASE_URL], function (){

@@ -25,6 +25,36 @@ function seedie($variable){
     return;
 }
 
+//Function to handle upload of images
+function uploadFile($files,$resourceId,$allowedExtensions=["jpg","jpeg","png","csv","xlsx"]){
+    if(empty($files)){
+        throw new Exception("No file has been submitted.");
+    }
+    $dataToDb=array();
+
+    foreach($_FILES as $index=>$file){
+        $data=array();
+        $fileInfo=pathinfo($file["name"]);
+        //pathinfo(filename)=[dirname,basename,extension,filename]
+        //$file=[name,type,tmp_name,error,size]
+        if(!in_array($fileInfo["extension"],$allowedExtensions)){
+            throw new Exception("Invalid File Extension: ".$fileInfo["extension"]);
+        }
+        if($file["size"]>=5000000){
+            throw new Exception("File Too Big");
+        }
+        $newFileName=$resourceId."_".rand().".".$fileInfo["extension"];
+        $fileNameNoExt=$resourceId."_".rand();
+        $data["name"]=$newFileName;
+        move_uploaded_file($file["tmp_name"],__DIR__."\Storage\\".$newFileName);
+        $fileUrl=CURRENT_URL."/$fileNameNoExt";
+        $data["url"]=$fileUrl;
+        $data["resourceId"]=$resourceId;
+        $dataToDb[]=$data;
+    }
+    return $dataToDb;
+}
+
 //STANDARD RESPONSE
 // {
 //     'success':0,
