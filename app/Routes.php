@@ -17,8 +17,9 @@ use Pecee\Http\Response;
 
 use Pecee\SimpleRouter\SimpleRouter;
 
-//SimpleRouter::response()->header("Content-Type: application/json");
-SimpleRouter::response()->header("Access-Control-Allow-origin: http://localhost:3000"); //required with react apps. replace with the react app url upon deployment
+SimpleRouter::response()->header("Content-Type: application/json");
+SimpleRouter::response()->header("Access-Control-Allow-Origin: http://localhost:3000"); //required with react apps. replace with the react app url upon deployment
+SimpleRouter::response()->header("Access-Control-Allow-Headers: Content-type"); //required with react apps. replace with the react app url upon deployment
 
 #####################################START OF DEFAULT ROUTES! DO NOT DELETE#########################
 //ERROR HANDLING FOR ROUTING
