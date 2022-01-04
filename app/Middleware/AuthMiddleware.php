@@ -19,6 +19,7 @@ class AuthMiddleware implements IMiddleware{
             //decode the token
             $decoded=JWT::decode($token, new Key(APP_KEY, "HS512"));
             //verify expiry validity of the token
+            see($decoded);
             if($decoded->expiry <= time()){
                 throw new ExpiredException("Token has expired. Request for a new one");
             }

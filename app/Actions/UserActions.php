@@ -28,7 +28,7 @@ class UserActions{
         $userData=$userData[0];
         //generate the token
         $payload = array( //info will be used by middleware to authorize different accesses
-            "expiry" => time()+(10*60),
+            "expiry" => time()+(60*60), //set the expiry of the token (x*60)minutes
             "generated" => time(),
             "userId"=>$userData["username"]."-".$userData["id"]
         );
