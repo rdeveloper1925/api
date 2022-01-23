@@ -7,5 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Pecee\\' => array($vendorDir . '/pecee/simple-router/src/Pecee'),
+    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
 );

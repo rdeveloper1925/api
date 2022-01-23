@@ -10,6 +10,7 @@ class ComposerStaticInit5fe9c491a9ad26763a57a17bce38def2
         'P' => 
         array (
             'Pecee\\' => 6,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'F' => 
         array (
@@ -21,6 +22,10 @@ class ComposerStaticInit5fe9c491a9ad26763a57a17bce38def2
         'Pecee\\' => 
         array (
             0 => __DIR__ . '/..' . '/pecee/simple-router/src/Pecee',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'Firebase\\JWT\\' => 
         array (

@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '189b5266022b59e56cb98f5eab61bada246fc14e',
+    'reference' => '937507b0c2ec4dfc2d04a609026407022b6d05b4',
     'name' => '__root__',
   ),
   'versions' => 
@@ -41,7 +41,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '189b5266022b59e56cb98f5eab61bada246fc14e',
+      'reference' => '937507b0c2ec4dfc2d04a609026407022b6d05b4',
     ),
     'firebase/php-jwt' => 
     array (
@@ -60,6 +60,15 @@ private static $installed = array (
       array (
       ),
       'reference' => '032a2ae7e0e2d876599758f85b61bc965a63ea7c',
+    ),
+    'phpmailer/phpmailer' => 
+    array (
+      'pretty_version' => 'v6.5.3',
+      'version' => '6.5.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'baeb7cde6b60b1286912690ab0693c7789a31e71',
     ),
   ),
 );
